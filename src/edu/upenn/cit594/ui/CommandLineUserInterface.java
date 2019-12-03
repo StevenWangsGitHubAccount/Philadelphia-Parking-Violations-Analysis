@@ -74,7 +74,7 @@ public class CommandLineUserInterface {
 		System.out.println("3: show the average market value for residences in a specified ZIP Code.");
 		System.out.println("4: show the average total livable area for residences in a specified ZIP Code.");
 		System.out.println("5: show the total residential market value per capita for a specified ZIP Code.");
-		System.out.println("6: the program should show the results of your custom feature.");//TODO need discuss
+		System.out.println("6: show the correlation coefficient for total parking fines per capita and total residential market value per capita.");
 		System.out.print("Please enter your selection: ");
 		String userInput = getScanner().next();
 		if(userInput.length() == 1) {
@@ -137,6 +137,12 @@ public class CommandLineUserInterface {
 
 	public void printTotalResidentialMarketValuePerCapita(double totalResidentialMarketValuePerCapita) {
 		System.out.println(truncToIntegerString(totalResidentialMarketValuePerCapita));
+	}
+	
+	public void printCorrelationCoefficient(double correlationCoefficient) {
+		System.out.printf("The correlation coefficient for "
+				+ "total fines per capita and total residential"
+				+ " market value per capita is %.10f", correlationCoefficient);
 	}
 
 }
