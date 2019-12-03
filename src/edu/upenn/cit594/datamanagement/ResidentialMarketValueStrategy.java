@@ -18,14 +18,21 @@ public class ResidentialMarketValueStrategy implements ResidentialStrategy {
 					double price = Double.parseDouble(p.getMarket_value());
 					totalPrice += price;
 					residentceCount++;
+					// debugging
+//					System.out.println("Price: " + price);
+//					System.out.println("Residence count: " + residentceCount);
+//					System.out.println();
 				}
 				catch(Exception e) {
 					continue;
 				}
 			}
 		}
-		if(residentceCount > 0 && totalPrice > 0) return totalPrice/residentceCount; 
-		return 0;
+		if(residentceCount > 0 && totalPrice > 0) {
+			return totalPrice/residentceCount; 
+		} else {
+			return 0;
+		}
 	}
 
 }

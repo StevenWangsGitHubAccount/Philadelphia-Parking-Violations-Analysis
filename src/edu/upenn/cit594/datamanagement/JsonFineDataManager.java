@@ -13,6 +13,15 @@ import edu.upenn.cit594.data.Fine;
 import edu.upenn.cit594.logging.Logger;
 
 public class JsonFineDataManager extends FineDataManager {
+	/*
+	 * 12/2/19
+	 * I removed the "ticket_number" field from the Fine class and its constructor.
+	 * This is because the JsonFineDataManager class was throwing an exception when I ran the code.
+	 * Evidently, the JSONarray treated "ticket_number" as a long and refused to cast it as a string.
+	 * Given that ticket numbers are not used anywhere in the project, the most expedient
+	 * solution seemed to do away with the field in this class. Other classes that depend on 
+	 * the Fine class have also been modified so that "ticket_number" is no longer an issue.
+	 */
 
 	@Override
 	public List<Fine> getFineList(Logger _log, String fileName) {
@@ -32,13 +41,14 @@ public class JsonFineDataManager extends FineDataManager {
 		while (iter.hasNext()) {
 			JSONObject fineObj = (JSONObject) iter.next();
 			String date = (String) fineObj.get("date");
-		    String fine = (String) fineObj.get("fine");
+		    long fineL = (long) fineObj.get("fine");
+		    double fine = (double) fineL;
 		    String violation = (String) fineObj.get("violation");
 		    String plate_id = (String) fineObj.get("plate_id");
 		    String state = (String) fineObj.get("state");
-		    String ticket_number = (String) fineObj.get("ticket_number");
+		    //String ticket_number = (String) fineObj.get("ticket_number");
 		    String zip_code = (String) fineObj.get("zip_code");
-		    Fine f = createFineObj(ticket_number, plate_id, date, zip_code, violation, fine, state);
+		    Fine f = createFineObj(plate_id, date, zip_code, violation, fine, state);
 			if(f != null) {
 				fineList.add(f);
 			}

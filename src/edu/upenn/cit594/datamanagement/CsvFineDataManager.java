@@ -24,7 +24,8 @@ public class CsvFineDataManager extends FineDataManager {
 				String[] values = row.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 				int i = 0;
 			    String date = values[i++].trim();
-			    String fine = values[i++].trim();
+			    String fineString = values[i++].trim();
+			    double fine = Double.parseDouble(fineString);
 			    String violation = values[i++].trim();
 			    String plate_id = values[i++].trim();
 			    String state = values[i++].trim();
@@ -33,7 +34,7 @@ public class CsvFineDataManager extends FineDataManager {
 			    if(zip_code.length() > 5) {
 			    	zip_code = zip_code.substring(0, 5);
 			    }
-			    Fine f = createFineObj(ticket_number, plate_id, date, zip_code, violation, fine, state);
+			    Fine f = createFineObj(plate_id, date, zip_code, violation, fine, state);
 				if(f != null) {
 					fineList.add(f);
 				}
