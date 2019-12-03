@@ -3,6 +3,7 @@ package edu.upenn.cit594.processor;
 import java.util.Map;
 
 import edu.upenn.cit594.data.UserInputArguments;
+import edu.upenn.cit594.datamanagement.PopulationDataManager;
 import edu.upenn.cit594.datamanagement.ResidentialMarketValueStrategy;
 import edu.upenn.cit594.datamanagement.ResidentialTotalLivableAreaStrategy;
 import edu.upenn.cit594.logging.Logger;
@@ -65,8 +66,25 @@ public class JobProcessor {
 					break;
 				}
 				case 6: {
-					System.out.println("case 6");//TODO
-					break;
+					
+					// calculate correlation coefficient of total fines per capita and 
+					// total residential market value per capita
+					//
+					// create ParkingFineProcessor object
+					// get map of zipcodes to total fines per capita
+					ParkingFineProcessor pfp = new ParkingFineProcessor();
+					Map<Integer, Double> zip_fine_map = pfp.getZipFineMap(_log, userArgs.getParking_violation_input_file_format(), userArgs.getParking_violation_input_file_name(), userArgs.getPopulation_input_file_name());
+					
+					// create PropertiesProcessor object
+					// get map of zipcodes to total residential market value per capita
+					PropertiesProcessor pp = new PropertiesProcessor();
+					Map<Integer, Double> zip_value_map = pp.getZipMarketValuePerCapitaMap(_log, userArgs.getProperty_values_input_file_name(), userArgs.getPopulation_input_file_name());
+					
+					// calculate correlation coefficient
+					// print correlation coefficient
+					CorrelationProcessor cp = new CorrelationProcessor();
+					double correlationCoefficient = cp.calculateCorrelationCoefficient(zip_fine_map, zip_value_map);
+					ui.printCorrelationCoefficient(correlationCoefficient);
 				}
 			}
 		}

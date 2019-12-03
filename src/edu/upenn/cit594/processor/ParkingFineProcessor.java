@@ -51,8 +51,7 @@ public class ParkingFineProcessor {
 		fineList.forEach(f -> {
 			String zipString = f.getZip_code();
 			int zip = Integer.parseInt(zipString);
-			String fineString = f.getFine();
-			Double fine = Double.parseDouble(fineString);
+			Double fine = f.getFine();
 			if(zipFineMap.containsKey(zip)) {
 				zipFineMap.put(zip, zipFineMap.get(zip) + fine);
 			}

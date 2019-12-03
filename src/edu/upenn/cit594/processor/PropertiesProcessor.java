@@ -1,5 +1,6 @@
 package edu.upenn.cit594.processor;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +69,31 @@ public class PropertiesProcessor {
 			return totalResidentialmarketValueInZip / population;
 		}
 		return 0;
+	}
+	
+	public Map<Integer, Double> getZipMarketValuePerCapitaMap (Logger _log, String property_values_input_file_name,
+			String population_input_file_name){
+		
+		// This function returns a map of zip codes to total market values per capita.
+		// The map will be used to calculate the correlation coefficient (choice 6).
+		
+		HashMap<Integer, Double> zipValueMap = new HashMap<Integer, Double>();
+		
+		
+		PopulationDataManager pdm = new PopulationDataManager();
+		Map<Integer, Long> zipPopulationMap = pdm.getZipPopulationMap(_log, population_input_file_name);
+		
+		//iterate through each zip code
+		// retrieve zip code's market value per capita
+		// put each zip code and market value per capita in hashmap
+		for (int zip : zipPopulationMap.keySet()) {
+			String zipString = Integer.toString(zip);
+			double marketValuePerCapita = getTotalResidentialMarketValuePerCapita(_log, zipString, property_values_input_file_name,
+					population_input_file_name);
+			zipValueMap.put(zip, marketValuePerCapita);
+		}
+		
+		return zipValueMap;
 	}
 
 }
