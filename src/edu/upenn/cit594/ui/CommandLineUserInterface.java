@@ -142,7 +142,7 @@ public class CommandLineUserInterface {
 	public void printCorrelationCoefficient(double correlationCoefficient) {
 		System.out.printf("The correlation coefficient for "
 				+ "total fines per capita and total residential"
-				+ " market value per capita is %.10f", correlationCoefficient);
+				+ " market value per capita is %.4f", correlationCoefficient);
 	}
 
 }
