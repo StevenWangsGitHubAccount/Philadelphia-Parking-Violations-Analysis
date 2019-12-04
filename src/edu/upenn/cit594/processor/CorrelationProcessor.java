@@ -31,6 +31,12 @@ public class CorrelationProcessor {
 		for (Integer zip : zipFineMap.keySet()) {
 			// make sure that the zip code also appears in the zipValueMap keyset
 			if (zipValueMap.containsKey(zip)) {
+				//debugging
+//				System.out.println("zip code: " + zip);
+//				System.out.println("Per capita fine: " + zipFineMap.get(zip));
+//				System.out.println("Per capita market value: " + zipValueMap.get(zip));
+//				System.out.println();
+				
 				finesPerCapita.add(zipFineMap.get(zip));
 				valuesPerCapita.add(zipValueMap.get(zip));
 			}
@@ -45,12 +51,32 @@ public class CorrelationProcessor {
 		double meanFinePerCapita = calculateMean(finesPerCapita);
 		double meanValuePerCapita = calculateMean(valuesPerCapita);
 		double standardDeviationFines = calculateStandardDeviation(finesPerCapita);
-		double standardDeviationsValues = calculateStandardDeviation(valuesPerCapita);
+		double standardDeviationValues = calculateStandardDeviation(valuesPerCapita);
 		double numerator = 0;
-		double denominator = standardDeviationFines * standardDeviationsValues * (numElements - 1);
+		for (Integer zip : zipFineMap.keySet()) {
+			if (zipValueMap.containsKey(zip)) {
+				double fine = zipFineMap.get(zip);
+				double value = zipValueMap.get(zip);
+				double diffFine = fine - meanFinePerCapita;
+				double diffValue = value - meanValuePerCapita;
+				numerator += (diffFine * diffValue);
+			}
+		}
+		double denominator = standardDeviationFines * standardDeviationValues * (numElements - 1);
 		if (denominator == 0) {
 			return 0;
 		}
+		
+		// debugging
+//		System.out.println("Mean fine per capita: " + meanFinePerCapita);
+//		System.out.println("SD fine: " + standardDeviationFines);
+//		System.out.println();
+//		System.out.println("Mean value per capita: " + meanValuePerCapita);
+//		System.out.println("SD value: " + standardDeviationValues);
+//		System.out.println();
+//		System.out.println("Numerator: " + numerator);
+//		System.out.println("Denominator: " + denominator);
+		
 		
 		for (Integer zip : zipFineMap.keySet()) {
 			if (zipValueMap.containsKey(zip)) {
