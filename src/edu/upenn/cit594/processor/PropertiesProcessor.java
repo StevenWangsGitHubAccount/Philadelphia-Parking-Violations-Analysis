@@ -13,6 +13,8 @@ public class PropertiesProcessor {
 	
 	//Cache the result, file is large, save List for reuse
 	private static List<Property> propertiesList;
+	// implementing memoization
+	private Map<String, Double> zipTotalMarketValueMap = new HashMap<String, Double>();
 	
 	private List<Property> getPropertiesList(Logger _log, String fileName) {
 		if(propertiesList == null || propertiesList.isEmpty()) {
@@ -37,6 +39,25 @@ public class PropertiesProcessor {
 			return 0;
 		}
 		
+		// if total residential market value per capita has been calculated for 
+		// the zip code, return the appropriate value from the hashmap
+		// else, calculate it
+		
+		if (zipTotalMarketValueMap.containsKey(zip)) {
+			return zipTotalMarketValueMap.get(zip);
+		} else {
+			double totalMarketValuePerCapita = calculateTotalMarketValuePerCapita(_log, zip, 
+					property_values_input_file_name, population_input_file_name);
+			zipTotalMarketValueMap.put(zip, totalMarketValuePerCapita);
+			return totalMarketValuePerCapita;
+		}
+		
+		
+	}
+	
+	private double calculateTotalMarketValuePerCapita(Logger _log, String zip, String property_values_input_file_name, 
+			String population_input_file_name) {
+		// helper function to calculate the total market value per capita for a zip code
 		PopulationDataManager pdm = new PopulationDataManager();
 		Map<Integer, Long> zipPopulationMap = pdm.getZipPopulationMap(_log, population_input_file_name);
 		double population = 0;

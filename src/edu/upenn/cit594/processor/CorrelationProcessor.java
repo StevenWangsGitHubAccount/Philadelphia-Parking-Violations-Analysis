@@ -2,10 +2,14 @@ package edu.upenn.cit594.processor;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CorrelationProcessor {
+	
+	// implementing memoization
+	private Map<Map<Integer, Double>, Double> correlationMap = new HashMap<Map<Integer, Double>, Double>();
 	
 	public double calculateCorrelationCoefficient(Map<Integer, Double> zipFineMap, Map<Integer, Double> zipValueMap) {
 		
@@ -21,31 +25,34 @@ public class CorrelationProcessor {
 			return 0;
 		}
 		
+		// if the correlation coefficient has been calculated already, return it
+		// else calculate it
+		
+		if (correlationMap.containsKey(zipFineMap)) {
+			return correlationMap.get(zipFineMap);
+		} else {
+			double correlationCoefficient = determineCorrelationCoefficient(zipFineMap, zipValueMap);
+			correlationMap.put(zipFineMap, correlationCoefficient);
+			return correlationCoefficient;
+		}
+		
+	}
+	
+	private double determineCorrelationCoefficient(Map<Integer, Double> zipFineMap, Map<Integer, Double> zipValueMap) {
+		// helper function to determine the correlation coefficient
+		
 		ArrayList<Double> finesPerCapita = new ArrayList<Double>();
 		ArrayList<Double> valuesPerCapita = new ArrayList<Double>();
 
-		
-		
 		// get lists of per capita fines and per capita market values for each zip code
 		// iterate through each zip code in the zipFineMap keyset
 		for (Integer zip : zipFineMap.keySet()) {
 			// make sure that the zip code also appears in the zipValueMap keyset
-			if (zipValueMap.containsKey(zip)) {
-				//debugging
-//				System.out.println("zip code: " + zip);
-//				System.out.println("Per capita fine: " + zipFineMap.get(zip));
-//				System.out.println("Per capita market value: " + zipValueMap.get(zip));
-//				System.out.println();
-				
+			if (zipValueMap.containsKey(zip)) {				
 				finesPerCapita.add(zipFineMap.get(zip));
 				valuesPerCapita.add(zipValueMap.get(zip));
 			}
 		}
-		//debugging
-		//System.out.println(finesPerCapita.isEmpty());
-		//System.out.println(valuesPerCapita.isEmpty());
-		//System.out.println(finesPerCapita.size());
-		//System.out.println(valuesPerCapita.size());
 		
 		int numElements = finesPerCapita.size();
 		double meanFinePerCapita = calculateMean(finesPerCapita);
@@ -67,17 +74,6 @@ public class CorrelationProcessor {
 			return 0;
 		}
 		
-		// debugging
-//		System.out.println("Mean fine per capita: " + meanFinePerCapita);
-//		System.out.println("SD fine: " + standardDeviationFines);
-//		System.out.println();
-//		System.out.println("Mean value per capita: " + meanValuePerCapita);
-//		System.out.println("SD value: " + standardDeviationValues);
-//		System.out.println();
-//		System.out.println("Numerator: " + numerator);
-//		System.out.println("Denominator: " + denominator);
-		
-		
 		for (Integer zip : zipFineMap.keySet()) {
 			if (zipValueMap.containsKey(zip)) {
 				double differenceFine = zipFineMap.get(zip) - meanFinePerCapita;
@@ -85,12 +81,10 @@ public class CorrelationProcessor {
 				denominator += differenceFine * differenceValue;
 			}
 		}
-		
-		return numerator / denominator;
-		
+		return numerator / denominator;	
 	}
 	
-	public double calculateMean(List<Double> valuesList) {
+	private double calculateMean(List<Double> valuesList) {
 		// helper function to calculate mean value of a list of doubles
 		int numElements = valuesList.size();
 		if (numElements == 0) {
@@ -103,7 +97,7 @@ public class CorrelationProcessor {
 		return aggregate / numElements;
 	}
 	
-	public double calculateStandardDeviation(List<Double> valuesList) {
+	private double calculateStandardDeviation(List<Double> valuesList) {
 		// helper function to calculate standard deviation of a list of doubles
 		int numElements = valuesList.size() - 1;
 		if (numElements <= 0) {

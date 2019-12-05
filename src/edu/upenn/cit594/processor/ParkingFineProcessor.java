@@ -12,12 +12,33 @@ import edu.upenn.cit594.datamanagement.PopulationDataManager;
 import edu.upenn.cit594.logging.Logger;
 
 public class ParkingFineProcessor {
+	
+	// implementing memoization
+	private Map<String, Map<Integer, Double>> fineMap = new HashMap<String, Map<Integer, Double>>();
+	
 
 	public Map<Integer, Double> getZipFineMap(Logger _log, 
 			String parking_violation_input_file_format,
 			String parking_violation_input_file_name, 
 			String population_input_file_name) {
 		
+		// if a map of zipcodes to total fines per capita exists for the input file, return it
+		// else construct the map
+		if (fineMap.containsKey(parking_violation_input_file_name)) {
+			return fineMap.get(parking_violation_input_file_name);
+		} else {
+			Map<Integer, Double> zipFineMap = constructZipFineMap(_log, parking_violation_input_file_format, 
+					parking_violation_input_file_name, population_input_file_name);
+			fineMap.put(parking_violation_input_file_name, zipFineMap);
+			return zipFineMap;
+		}
+	}
+	
+	private Map<Integer, Double> constructZipFineMap(Logger _log, 
+			String parking_violation_input_file_format,
+			String parking_violation_input_file_name, 
+			String population_input_file_name) {
+		// helper function to construct a map of zip codes to total fines per capita
 		FineDataManagerInterface fdm = null;
 		
 		if("csv".equals(parking_violation_input_file_format)) {
