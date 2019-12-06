@@ -9,7 +9,7 @@ import java.util.List;
 import edu.upenn.cit594.data.Fine;
 import edu.upenn.cit594.logging.Logger;
 
-public class CsvFineDataManager extends FineDataManager {
+public class CsvFineDataManager implements FineDataManagerInterface {
 	
 	@Override
 	public List<Fine> getFineList(Logger _log, String fileName) {
@@ -34,7 +34,14 @@ public class CsvFineDataManager extends FineDataManager {
 			    if(zip_code.length() > 5) {
 			    	zip_code = zip_code.substring(0, 5);
 			    }
-			    Fine f = createFineObj(plate_id, date, zip_code, violation, fine, state);
+			    
+			    if(zip_code == null || "".equalsIgnoreCase(zip_code.trim())) {
+					continue;
+				}
+				if(!"PA".equalsIgnoreCase(state)) {
+					continue;
+				}
+			    Fine f = new Fine(plate_id, date, zip_code, violation, fine, state);
 				if(f != null) {
 					fineList.add(f);
 				}

@@ -12,7 +12,7 @@ import org.json.simple.parser.JSONParser;
 import edu.upenn.cit594.data.Fine;
 import edu.upenn.cit594.logging.Logger;
 
-public class JsonFineDataManager extends FineDataManager {
+public class JsonFineDataManager implements FineDataManagerInterface {
 	/*
 	 * 12/2/19
 	 * I removed the "ticket_number" field from the Fine class and its constructor.
@@ -48,7 +48,13 @@ public class JsonFineDataManager extends FineDataManager {
 		    String state = (String) fineObj.get("state");
 		    //String ticket_number = (String) fineObj.get("ticket_number");
 		    String zip_code = (String) fineObj.get("zip_code");
-		    Fine f = createFineObj(plate_id, date, zip_code, violation, fine, state);
+		    if(zip_code == null || "".equalsIgnoreCase(zip_code.trim())) {
+				continue;
+			}
+			if(!"PA".equalsIgnoreCase(state)) {
+				continue;
+			}
+		    Fine f = new Fine(plate_id, date, zip_code, violation, fine, state);
 			if(f != null) {
 				fineList.add(f);
 			}
