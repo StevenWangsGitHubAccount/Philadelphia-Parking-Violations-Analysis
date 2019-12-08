@@ -9,10 +9,14 @@ import java.util.Map;
 import edu.upenn.cit594.logging.Logger;
 
 public class PopulationDataManager {
+	
+	private static Map<Integer, Long> zipPolulationMap;
 
 	public Map<Integer, Long> getZipPopulationMap(Logger _log, String population_input_file_name) {
 		
-		Map<Integer, Long> zipPolulationMap = new HashMap<Integer, Long>();
+		if(zipPolulationMap != null) return zipPolulationMap; 
+		
+		zipPolulationMap = new HashMap<Integer, Long>();
 		
 		try {
 			_log.log(System.currentTimeMillis() + " " + population_input_file_name);
