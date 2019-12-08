@@ -1,14 +1,14 @@
 package edu.upenn.cit594;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
-import java.util.Scanner;
 
 import edu.upenn.cit594.data.UserInputArguments;
 import edu.upenn.cit594.datamanagement.ResidentialMarketValueStrategy;
 import edu.upenn.cit594.datamanagement.ResidentialTotalLivableAreaStrategy;
 import edu.upenn.cit594.logging.Logger;
-import edu.upenn.cit594.processor.ArgumentProcessor;
 import edu.upenn.cit594.processor.CorrelationProcessor;
 import edu.upenn.cit594.processor.ParkingFineProcessor;
 import edu.upenn.cit594.processor.PopulationProcessor;
@@ -17,64 +17,18 @@ import edu.upenn.cit594.ui.CommandLineUserInterface;
 
 public class Main {
 	
-	private static Scanner scanner;
-	
-	private static Scanner getScanner() {
-		if(scanner == null) {
-			scanner = new Scanner(System.in);
-		}
-		return scanner;
-	}
-	
-	public static int getUserInput() {
-		System.out.println();
-		System.out.println("Please enter a number from 0 to 6 to perform the following action:");
-		System.out.println("0: Exit.");
-		System.out.println("1: show the total population for all ZIP Codes.");
-		System.out.println("2: show the total parking fines per capita for each ZIP Code,.");
-		System.out.println("3: show the average market value for residences in a specified ZIP Code.");
-		System.out.println("4: show the average total livable area for residences in a specified ZIP Code.");
-		System.out.println("5: show the total residential market value per capita for a specified ZIP Code.");
-		System.out.println("6: show the correlation coefficient for total parking fines per capita and total residential market value per capita.");
-		System.out.print("Please enter your selection: ");
-		String userInput = getScanner().next();
-		if(userInput.length() == 1) {
-			int userInputInt = -1;
-			try {
-				userInputInt = Integer.parseInt(userInput);
-			} catch(Exception e) {
-				userInputInt = -1;
-			}
-			if(userInputInt >= 0 && userInputInt <= 6) {
-				return userInputInt;
-			}
-		}
-		
-		System.err.println("Error: You can only enter a number from 0 to 6.");
-		System.exit(1);
-		return 0;
-	}
-	
-	public static String getZipFromUser() {
-		System.out.print("Please enter a zip code: ");
-		String zip = getScanner().next();
-		return zip;
-	}
-	
 	public static void main(String[] args) throws IOException {
 		
 		CommandLineUserInterface ui = new CommandLineUserInterface();
-		ArgumentProcessor ap = new ArgumentProcessor();
 		
-		UserInputArguments userArgs = ap.readRuntimeArgs(args);
+		UserInputArguments userArgs = readRuntimeArgs(args);
 		
 		Logger _log = Logger.getInstance(userArgs.getLog_file_name());
 		
 		_log.log(System.currentTimeMillis() + " " + userArgs.getParking_violation_input_file_format() + " " + userArgs.getParking_violation_input_file_name() + " " + userArgs.getProperty_values_input_file_name() + " " + userArgs.getPopulation_input_file_name() + " " + userArgs.getLog_file_name());
 		
 		while(true) {
-			int userInput = getUserInput();
-			_log.log(System.currentTimeMillis() + " user selected " + userInput);
+			int userInput = ui.getUserInput(_log);
 			switch(userInput) {
 				case 0: {
 					System.out.println("User select 0, program exit.");
@@ -94,7 +48,7 @@ public class Main {
 					break;
 				}
 				case 3: {
-					String zip = getZipFromUser();
+					String zip = ui.getZipFromUser();
 					_log.log(System.currentTimeMillis() + " user entered zip: " + zip);
 					PropertiesProcessor pp = new PropertiesProcessor();
 					double averageResidentialMarketValue = pp.getAverage(_log, zip, userArgs.getProperty_values_input_file_name(), new ResidentialMarketValueStrategy());
@@ -102,7 +56,7 @@ public class Main {
 					break;
 				}
 				case 4: {
-					String zip = getZipFromUser();
+					String zip = ui.getZipFromUser();
 					_log.log(System.currentTimeMillis() + " user entered zip: " + zip);
 					PropertiesProcessor pp = new PropertiesProcessor();
 					double averageResidentialTotalLivableArea = pp.getAverage(_log, zip, userArgs.getProperty_values_input_file_name(), new ResidentialTotalLivableAreaStrategy());
@@ -110,7 +64,7 @@ public class Main {
 					break;
 				}
 				case 5: {
-					String zip = getZipFromUser();
+					String zip = ui.getZipFromUser();
 					_log.log(System.currentTimeMillis() + " user entered zip: " + zip);
 					PropertiesProcessor pp = new PropertiesProcessor();
 					double totalResidentialMarketValuePerCapita = pp.getTotalResidentialMarketValuePerCapita(_log, zip, userArgs.getProperty_values_input_file_name(), userArgs.getPopulation_input_file_name());
@@ -140,6 +94,72 @@ public class Main {
 				}
 			}
 		}
+	}
+	
+	public static UserInputArguments readRuntimeArgs(String[] args) {
+		
+		if(!isNumberOfArgumentsValid(args)) {
+			System.err.println("Error: The number of runtime arguments is incorrect.");
+			System.exit(1);
+		}
+		
+		String parking_violation_input_file_format = args[0];
+		String parking_violation_input_file_name = args[1];
+		String property_values_input_file_name = args[2];
+		String population_input_file_name = args[3];
+		String log_file_name = args[4];
+		
+		if(!isParkingViolationInputFileFormatValid(parking_violation_input_file_format)) {
+			System.err.println("Error: The parking violation input file format should be either \"csv\" or \"json\".");
+			System.exit(1);
+		}
+		
+		if(!isFileExistAndReadable(parking_violation_input_file_name)) {
+			System.err.println("Error: The parking violation input file is not exist or not readable.");
+			System.exit(1);
+		}
+		
+		if(!isFileExistAndReadable(property_values_input_file_name)) {
+			System.err.println("Error: The property values input file is not exist or not readable.");
+			System.exit(1);
+		}
+		
+		if(!isFileExistAndReadable(population_input_file_name)) {
+			System.err.println("Error: The population input file is not exist or not readable.");
+			System.exit(1);
+		}
+		
+		UserInputArguments uia = new UserInputArguments();
+		uia.setParking_violation_input_file_format(parking_violation_input_file_format);
+		uia.setParking_violation_input_file_name(parking_violation_input_file_name);
+		uia.setProperty_values_input_file_name(property_values_input_file_name);
+		uia.setPopulation_input_file_name(population_input_file_name);
+		uia.setLog_file_name(log_file_name);
+		
+		return uia;
+	}
+	
+	public static boolean isNumberOfArgumentsValid(String[] args) {
+		return args != null && args.length == 5;
+	}
+	
+	public static boolean isParkingViolationInputFileFormatValid(String tweets_input_file_format) {
+		return tweets_input_file_format.equals("csv") 
+				|| tweets_input_file_format.equals("json");
+	}
+	
+	public static boolean isFileExistAndReadable(String filename) {
+		return isFileExist(filename) && isFileReadable(filename);
+	}
+	
+	public static boolean isFileExist(String filename) {
+		File tempFile = new File(filename);
+		return tempFile.exists();
+	}
+	
+	private static boolean isFileReadable(String filename) {
+		File tempFile = new File(filename);
+		return Files.isReadable(tempFile.toPath());
 	}
 	
 }

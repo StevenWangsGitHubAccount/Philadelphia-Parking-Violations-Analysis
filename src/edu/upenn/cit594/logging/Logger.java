@@ -5,8 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import edu.upenn.cit594.processor.ArgumentValidatorProcessor;
-
 public class Logger {
 	
 	private String log_file_name;
@@ -16,7 +14,7 @@ public class Logger {
 	
 	private Logger(String log_file_name) {
 		this.log_file_name = log_file_name;
-		if(!new ArgumentValidatorProcessor().isFileExist(log_file_name)) {
+		if(!isFileExist(log_file_name)) {
 			File logFile = new File(log_file_name);
 			try {
 				logFile.createNewFile();
@@ -62,6 +60,11 @@ public class Logger {
 	    PrintWriter printWriter = new PrintWriter(fileWriter);
 	    printWriter.printf("%s\n", msg);
 	    printWriter.close();
+	}
+	
+	public boolean isFileExist(String filename) {
+		File tempFile = new File(filename);
+		return tempFile.exists();
 	}
 
 }
