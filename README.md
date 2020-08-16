@@ -1,6 +1,6 @@
 # Philadelphia-Parking-Violations-Analysis
 
-This application reads files with data on Philadelphia parking violations (from Philadelphia's OpenData site), residential property values, and population by zip code. The user can request, and the application will display:
+This Java application reads files with data on Philadelphia parking violations (from Philadelphia's OpenData site), residential property values, and population by zip code. The user can request, and the application will display:
 
 1. The total population for all Philadelphia zip codes
 2. Total parking fines per capita for each zip code
