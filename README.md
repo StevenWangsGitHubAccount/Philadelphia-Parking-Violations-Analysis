@@ -1,5 +1,7 @@
 # Philadelphia-Parking-Violations-Analysis
 
+This application was developed by Steven Wang and Mengxue Li.
+
 This Java application reads files with data on Philadelphia parking violations (from Philadelphia's OpenData site), residential property values, and population by zip code. The user can request, and the application will display:
 
 1. The total population for all Philadelphia zip codes
@@ -8,5 +10,3 @@ This Java application reads files with data on Philadelphia parking violations (
 4. Average residential total living area for a zip code specified by the user
 5. Total residential market value for a zip code specified by the user
 6. The correlation coefficient for total parking fines per capita and total residential market value per capita
-
-This application was developed by Steven Wang and Mengxue Li as the final project for Penn MCIT Online 594 (Data Structures and Software Design), Fall Semester 2019.
